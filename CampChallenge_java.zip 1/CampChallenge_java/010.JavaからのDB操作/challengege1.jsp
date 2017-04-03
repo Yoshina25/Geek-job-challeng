@@ -31,22 +31,37 @@ public class challengege1 extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
+        
+        
        try( PrintWriter out = response.getWriter();){
         
+        //データベースへの接続管理。
         Connection db_con = null;
+        PreparedStatement st_db = null;
         
         try{
             Class.forName("com.mysql.jdbc.Driver").newInstance();
+            
+            //db_conにデータベースを接続する。
             db_con = DriverManager.getConnection("jdbc:mysql://localhost:3306/challengedb","yukizakura","pass");
             
+            //st_dbに値を持たせて、データベースに挿入する?
+            st_db = db_con.prepareStatement("insert into profiles(profilesID,name,tell,age,birthday)values(5,'デイダラボッチ','110-119-115',1550,'1927-04-01')");
+            st_db.executeUpdate();
+            
+            //処理を終了させる。
             db_con.close();
-            out.println ("接続に成功しました。");    
+            st_db.close();
+            
+            out.println ("接続に成功しました。");
+        
+        //エラーハンドリング。
         }catch(SQLException e_sql){
             out.println("接続時にエラーが発生しました"+e_sql.toString());
         }catch(Exception e){
             out.println("接続時にエラーが発生しました。"+e.toString());
         }finally{
-            if(db_con != null){
+            if(db_con != null || st_db != null){
                  try{             
                      db_con.close();
                     }catch(Exception e_con){
